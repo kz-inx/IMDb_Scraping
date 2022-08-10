@@ -3,6 +3,9 @@ from django.db import models
 # Create your models here.
 
 class IMDbScrapping(models.Model):
+    """
+    Creating the filed for store data into our database
+    """
     name = models.CharField(max_length=1000)
     link = models.CharField(max_length=1000)
     rating = models.CharField(max_length=300)
