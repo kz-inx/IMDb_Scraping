@@ -13,3 +13,4 @@ class ImdbscraperItem(DjangoItem):
     django_model = IMDbScrapping
 
 
+

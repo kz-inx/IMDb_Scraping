@@ -5,7 +5,6 @@ from scrapy.exceptions import IgnoreRequest
 from scrapy.utils.defer import defer_fail
 from twisted.python import failure
 
-
 class ImdbSpiderSpider(scrapy.Spider):
     name = 'imdb_spider'
     allowed_domains = ['www.imdb.com']
