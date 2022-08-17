@@ -15,3 +15,6 @@ class IMDbScrapping(models.Model):
     runtime = models.CharField(max_length=100)
     categories = models.CharField(max_length=300)
     vote = models.CharField(max_length=300)
+
+    def __str__(self):
+        return str(self.name)

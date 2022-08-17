@@ -1,11 +1,12 @@
 """ Import libraries """
 from .task import bakcgroung_scrapping
+from rest_framework.exceptions import ValidationError
 from rest_framework.generics import ListAPIView, RetrieveAPIView, DestroyAPIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import Complex_IMDb
+from .serializers import Complex_IMDb,bulk_update
 from .models import IMDbScrapping
-from django.db.models import Q, Avg, Max, Min, Count
+from django.db.models import Q, Avg, Max, Min, F
 from rest_framework.views import APIView
 
 
@@ -17,12 +18,11 @@ class IMDbscrapping(ListAPIView):
     def get(self, request):
         """
         This function will when api hit it will go task file call that function
-        :param request: it will going the request task function for scrapping the data
+        :param request: it will go the request task function for scrapping the data
         :return: it will return the msg of success in the form the json to end user
         """
         bakcgroung_scrapping.delay()
-        return Response({'status': 'pass', 'msg': 'successfully data scraped'}, status=status.HTTP_200_OK)
-
+        return Response({'status': 'pass', 'msg': 'Scrapping InProgress '}, status=status.HTTP_200_OK)
 
 class movie_recommendation(ListAPIView):
     """
@@ -32,9 +32,12 @@ class movie_recommendation(ListAPIView):
     serializer_class = Complex_IMDb
 
     def get_queryset(self):
-        queryset = IMDbScrapping.objects.filter(name__endswith='Top Gun: Maverick')
+        # queryset = IMDbScrapping.objects.filter(name__startswith='Top Gun: Maverick')
+        # queryset = IMDbScrapping.objects.filter(vote__gt=90000)
+        # queryset = IMDbScrapping.objects.filter(runtime__lte=140)
+        queryset = IMDbScrapping.objects.filter(runtime__gte=90)
+        # queryset = IMDbScrapping.objects.filter(name__endswith='Top Gun: Maverick')
         return queryset
-
 
 class movie_search(ListAPIView):
     """
@@ -78,6 +81,9 @@ class limit_records(ListAPIView):
 
 
 class retrving_records(APIView):
+    """
+    Reterving the objects of particular id from the given into the parameter
+    """
     serializer_class = Complex_IMDb
 
     # queryset = IMDbScrapping.objects.all()
@@ -91,6 +97,9 @@ class retrving_records(APIView):
 
 
 class delte_objects(APIView):
+    """
+    Deleting the objects by taking the manual id of which object we need remove from our database
+    """
     serializer_class = Complex_IMDb
     # queryset = IMDbScrapping.objects.all()
     def delete(self, request):
@@ -100,7 +109,10 @@ class delte_objects(APIView):
         except:
             return Response({'msg': "data not found"}, status=status.HTTP_404_NOT_FOUND)
 
-class comparing_objects(APIView):
+class select_objects(APIView):
+    """
+    Select is the query booster in the orm, It will convert multiple query into the single query using the join
+    """
     serializer_class = Complex_IMDb
     def get(self,request):
         queryset = IMDbScrapping.objects.select_related().all()
@@ -108,10 +120,54 @@ class comparing_objects(APIView):
         return Response(serializer.data)
 
 class prefetch_objects(APIView):
+    """
+    Prefetch is also the query booster in the orm
+    """
     serializer_class = Complex_IMDb
     def get(self,request):
         queryset = IMDbScrapping.objects.prefetch_related().all()
         serializer = Complex_IMDb(instance=queryset, many=True)
         return Response(serializer.data)
+
+class field_compare_models(APIView):
+    """
+
+    """
+    serializer_class = Complex_IMDb
+    def get(self,request):
+        queryset = IMDbScrapping.objects.filter(runtime__gte=F('rating'))
+        serializer = Complex_IMDb(instance=queryset, many=True)
+        return Response(serializer.data)
+
+class bulk_update_view(APIView):
+    def put(self,request):
+        data = request.data
+
+        if data:
+            if not isinstance(data, list):
+                raise ValidationError('Expected list of dict.')
+
+            try:
+                id_count = {}
+                for i in data:
+                    id_count[i['id']] = id_count.get(i['id'], 0) + 1
+            except KeyError:
+                raise ValidationError('id or name is not present in data.')
+
+            context = {
+                'request': request,
+                'id_count': id_count
+            }
+
+            serializer = bulk_update(data=data, context=context, many=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({'msg':"SuccessFully Update into the database"}, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response('No Data to process', status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
 
 
