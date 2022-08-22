@@ -162,7 +162,7 @@ class bulk_update_view(APIView):
             serializer = bulk_update(data=data, context=context, many=True)
             if serializer.is_valid():
                 serializer.save()
-                return Response({'msg':"SuccessFully Update into the database"}, status=status.HTTP_201_CREATED)
+                return Response({'msg': "SuccessFully Update into the database"}, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response('No Data to process', status=status.HTTP_400_BAD_REQUEST)
 

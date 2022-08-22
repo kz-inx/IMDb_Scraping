@@ -15,7 +15,7 @@ class bulk_update(Complex_IMDb):
         attrs = super(bulk_update, self).validate(attrs)
         id_count = self.context.get('id_count', None)
         if id_count and id_count[f"{attrs['id']}"] > 1:
-            raise serializers.ValidationError({'id': 'Same id\'s present in data.'})
+            raise serializers.ValidationError({'id': 'Same ids present in data.'})
 
         return attrs
 
