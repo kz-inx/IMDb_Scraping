@@ -1,4 +1,4 @@
-# IMDB Scrapping
+# IMDB Scrapping <img src="/home/kunal/Task/Drf&Scrapy/imdb.jpg" width="35">
 
 Scrapping the IMDB website using the scrapy, creating the endpoint for run this scrapping using the DRF(Django Rest Farmework)
 <br/>
