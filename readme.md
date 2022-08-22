@@ -33,7 +33,7 @@ scrapy genspider spider_name specify url
 * ```
 
 ## General Settings 
-## Scrapy Settings 
+### Scrapy Settings 
 * ### Install Libraries Proxy settings 
 ```python
 pip install scrapy_proxy_pool
@@ -161,15 +161,15 @@ def bakcgroung_scrapping():
 ```
 ## Development 
 
-## Migrations changes 
+#### Migrations changes 
 ```python
-python manage.py makemigrations 
-python maange.py migrate 
+$ python manage.py makemigrations 
+$ python maange.py migrate 
 ```
 
-### Running Server 
+#### Running Server 
 ```python
-redis-server
-celery -A ImdbScrapping worker -l INFO 
-python manage.py runserver 
+$ redis-server
+$ celery -A ImdbScrapping worker -l INFO 
+$ python manage.py runserver 
 ```
