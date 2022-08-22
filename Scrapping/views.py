@@ -9,7 +9,6 @@ from .models import IMDbScrapping
 from django.db.models import Q, Avg, Max, Min, F
 from rest_framework.views import APIView
 
-
 class IMDbscrapping(ListAPIView):
     """
     to call this class from urls and hit API

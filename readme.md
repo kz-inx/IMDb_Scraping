@@ -3,8 +3,7 @@
 Scrapping the IMDB website using the scrapy, creating the endpoint for run this scrapping using the DRF(Django Rest Farmework)
 <br/>
 
-[![forthebadge made-with-python](http://ForTheBadge.com/images/badges/made-with-python.svg)](https://www.python.org/)                 
-
+[![forthebadge made-with-python](http://ForTheBadge.com/images/badges/made-with-python.svg)](https://www.python.org/)
 ## Requirements 
 * Python 
 * pycharm 
@@ -75,9 +74,8 @@ django.setup()
 ```python
 pip install celery
 sudo apt install redis-server
-
 ```
-See the install of reddis  section in the documentation at
+See the install of redis  section in the documentation at
 https://www.digitalocean.com/community/tutorials/how-to-install-and-secure-redis-on-ubuntu-20-04 for more details.
 
 ```console
@@ -171,5 +169,7 @@ python maange.py migrate
 
 ### Running Server 
 ```python
-python manage.py runserver
+redis-server
+celery -A ImdbScrapping worker -l INFO 
+python manage.py runserver 
 ```
