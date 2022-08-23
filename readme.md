@@ -30,7 +30,7 @@ python manage.py startapp App name
 scrapy startproject Project name 
 # create spider in the scrapy 
 scrapy genspider spider_name specify url 
-* ```
+```
 
 ## General Settings 
 ### Scrapy Settings 
