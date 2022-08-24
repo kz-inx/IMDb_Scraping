@@ -59,6 +59,6 @@ class ImdbSpiderSpider(scrapy.Spider):
             """
             yield defer_fail(failure.Failure(e))
 
-        # next_page = response.xpath("//a[@class='lister-page-next next-page']//@href").get()
-        # if next_page is not None:
-        #     yield scrapy.Request(response.urljoin(next_page))
+        next_page = response.xpath("//a[@class='lister-page-next next-page']//@href").get()
+        if next_page is not None:
+            yield scrapy.Request(response.urljoin(next_page))
