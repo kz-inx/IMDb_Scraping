@@ -1,8 +1,8 @@
 from rest_framework import serializers
 from .models import IMDbScrapping
 
-
 class Complex_IMDb(serializers.ModelSerializer):
+
     class Meta:
         model = IMDbScrapping
         fields = '__all__'
@@ -16,7 +16,6 @@ class bulk_update(Complex_IMDb):
         id_count = self.context.get('id_count', None)
         if id_count and id_count[f"{attrs['id']}"] > 1:
             raise serializers.ValidationError({'id': 'Same ids present in data.'})
-
         return attrs
 
     def create(self, validated_data):

@@ -8,7 +8,7 @@
 from itemadapter import ItemAdapter
 
 from Scrapping.models import IMDbScrapping
-
+from Scrapping.task import download_image
 
 class ImdbscraperPipeline:
     """ store the scraped data into database """
@@ -19,9 +19,15 @@ class ImdbscraperPipeline:
         :param item: it will go to return the data in the form of the dict
         :return: it will the dict in the form the
         """
-        ImdbscraperPipeline.data_store.append(IMDbScrapping(**item))
+        obj = IMDbScrapping(**item)
+        print(obj, '<<<<<', obj.image_urls, obj.image_file)
+        ImdbscraperPipeline.data_store.append(obj)
         # item.save()
         return item
 
     def close_spider(self, spider):
-        IMDbScrapping.objects.bulk_create(ImdbscraperPipeline.data_store)
+        objects = IMDbScrapping.objects.bulk_create(ImdbscraperPipeline.data_store)
+        for obj in objects:
+            download_image.delay(obj.id)
+
+

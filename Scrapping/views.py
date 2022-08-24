@@ -120,7 +120,7 @@ class select_objects(APIView):
 
 class prefetch_objects(APIView):
     """
-    Prefetch is also the query booster in the orm
+    Prefetch is also the query booster in the orm, it basically work on the many-to-many field in forgein key
     """
     serializer_class = Complex_IMDb
     def get(self,request):
@@ -130,7 +130,8 @@ class prefetch_objects(APIView):
 
 class field_compare_models(APIView):
     """
-
+    when we want to compare the different fields of the same database that time we can use this.
+    It will compare its running on the Bitwise operators
     """
     serializer_class = Complex_IMDb
     def get(self,request):
@@ -139,7 +140,15 @@ class field_compare_models(APIView):
         return Response(serializer.data)
 
 class bulk_update_view(APIView):
+    """
+    when we want to update many records in the single sql execution that time we can use the bulk updates
+    """
     def put(self,request):
+        """
+        Data should have given in the form of the list and inside the list it should be dictionary
+        :param request:  it sends data which we need to update, it should be correct format otherwise it raise error
+        :return: If data is update successfully it will return success msg or if any error is arise error
+        """
         data = request.data
 
         if data:
@@ -163,7 +172,7 @@ class bulk_update_view(APIView):
                 serializer.save()
                 return Response({'msg': "SuccessFully Update into the database"}, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        return Response('No Data to process', status=status.HTTP_400_BAD_REQUEST)
+        return Response({'msg': 'No Data to process'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 

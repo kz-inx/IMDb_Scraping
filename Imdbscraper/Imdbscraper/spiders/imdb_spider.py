@@ -24,9 +24,10 @@ class ImdbSpiderSpider(scrapy.Spider):
             After data get scrapped it will store into the database. 
             """
             self.logger.info('Parse function called on %s', response.url)
-            movies = response.xpath("//div[@class='lister-item-content']")
+            movies = response.xpath("//div[@class='lister-item mode-advanced']")
             for movie in movies:
                 item = ImdbscraperItem()
+                image_urls = movie.xpath(".//div[@class='lister-item-image float-left']//a//img//@loadlate").extract()
                 movie_name = movie.xpath(".//h3//a//text()").get()
                 movie_link = "https://www.imdb.com" + movie.xpath(".//h3//a//@href").get()
                 movie_rating = movie.xpath(".//div[@class='ratings-bar']//strong//text()").get()
@@ -41,7 +42,7 @@ class ImdbSpiderSpider(scrapy.Spider):
                 movie_runtime = movie.xpath(".//span[@class='runtime']//text()").get()
                 movie_categories = movie.xpath(".//span[@class='genre']//text()").get()
                 movie_vote = movie.xpath(".//p[@class='sort-num_votes-visible']//span[2]//text()").get()
-
+                item['image_urls'] = image_urls[0]
                 item['name'] = movie_name
                 item['link'] = movie_link
                 item['rating'] = movie_rating
@@ -58,6 +59,6 @@ class ImdbSpiderSpider(scrapy.Spider):
             """
             yield defer_fail(failure.Failure(e))
 
-        next_page = response.xpath("//a[@class='lister-page-next next-page']//@href").get()
-        if next_page is not None:
-            yield scrapy.Request(response.urljoin(next_page))
+        # next_page = response.xpath("//a[@class='lister-page-next next-page']//@href").get()
+        # if next_page is not None:
+        #     yield scrapy.Request(response.urljoin(next_page))
