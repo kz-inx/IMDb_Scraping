@@ -30,7 +30,7 @@ python manage.py startapp App name
 scrapy startproject Project name 
 # create spider in the scrapy 
 scrapy genspider spider_name specify url 
-* ```
+```
 
 ## General Settings 
 ### Scrapy Settings 
@@ -171,5 +171,9 @@ $ python maange.py migrate
 ```python
 $ redis-server
 $ celery -A ImdbScrapping worker -l INFO 
+<<<<<<< HEAD
 $ python manage.py runserver    
+=======
+$ python manage.py runserver 
+>>>>>>> 2e803aa541b6f1e4b0cefd1dbefcebdd8ca95c59
 ```
