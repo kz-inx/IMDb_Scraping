@@ -4,7 +4,7 @@ import os
 from .models import IMDbScrapping
 
 @shared_task()
-def bakcgroung_scrapping():
+def background_scrap():
     """ this function will run your task into the background process """
     os.system('python manage.py crawl')
 
