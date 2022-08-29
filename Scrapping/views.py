@@ -1,4 +1,5 @@
 """ Import libraries """
+import logging
 from .task import background_scrap
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import ListAPIView, RetrieveAPIView, DestroyAPIView
@@ -9,10 +10,13 @@ from .models import IMDbScrapping
 from django.db.models import Q, Avg, Max, Min, F
 from rest_framework.views import APIView
 
+
+logger = logging.getLogger('django')
 class IMDbScrap(ListAPIView):
     """
     to call this class from urls and hit API
     """
+
 
     def get(self, request):
         """
@@ -21,6 +25,7 @@ class IMDbScrap(ListAPIView):
         :return: it will return the msg of success in the form the json to end user
         """
         background_scrap.delay()
+        logging.info("Successfully the run the application")
         return Response({'status': 'pass', 'msg': 'Scrapping InProgress '}, status=status.HTTP_200_OK)
 
 class MovieRecommendation(ListAPIView):
@@ -34,7 +39,8 @@ class MovieRecommendation(ListAPIView):
         # queryset = IMDbScrapping.objects.filter(name__startswith='Top Gun: Maverick')
         # queryset = IMDbScrapping.objects.filter(vote__gt=90000)
         # queryset = IMDbScrapping.objects.filter(runtime__lte=140)
-        queryset = IMDbScrap.objects.filter(runtime__gte=90)
+        queryset = IMDbScrapping.objects.filter(runtime__gte=90)
+        logger.info('successfully run the movie recommendation')
         # queryset = IMDbScrapping.objects.filter(name__endswith='Top Gun: Maverick')
         return queryset
 
@@ -46,7 +52,8 @@ class MovieSearch(ListAPIView):
     serializer_class = ComplexImdbSerializers
 
     def get_queryset(self):
-        queryset = IMDbScrap.objects.filter(Q(rating__gt=8.5) | Q(runtime__lte=110))
+        queryset = IMDbScrapping.objects.filter(Q(rating__gt=8.5) | Q(runtime__lte=110))
+        logger.info(" Successfully run the movie search ")
         return queryset
 
 
@@ -60,9 +67,10 @@ class AggreateRating(APIView):
     def get(self, request):
         # queryset = IMDbScrapping.objects.aggregate(Min('rating'), Max('rating'))
         # queryset = IMDbScrapping.objects.aggregate(Min('vote'), Max('vote'))
-        queryset = IMDbScrap.objects.filter(runtime__lte=120).aggregate(Min('vote'), Max('vote'))
+        queryset = IMDbScrapping.objects.filter(runtime__lte=120).aggregate(Min('vote'), Max('vote'))
         # queryset = IMDbScrapping.objects.annotate(Count('vote'))
         # s = Complex_IMDb(instance=queryset, many=True)
+        logger.info('Successfully run the aggregate rating')
         return Response(queryset)
 
 
@@ -75,23 +83,24 @@ class LimitRecords(ListAPIView):
     serializer_class = ComplexImdbSerializers
     def get_queryset(self):
         # entry object will not support the negative index , it required only positive integer
-        queryset = IMDbScrap.objects.filter(rating__gt=7.9, runtime__gte=90)[:15]
+        queryset = IMDbScrapping.objects.filter(rating__gt=7.9, runtime__gte=90)[:15]
+        logger.info('Run with success the limit records')
         return queryset
 
 
 class ReturnRecords(APIView):
     """
-    Reterving the objects of particular id from the given into the parameter
+    Reserving the objects of particular id from the given into the parameter
     """
     serializer_class = ComplexImdbSerializers
-
-    # queryset = IMDbScrapping.objects.all()
     def get(self, request):
         try:
-            queryset = IMDbScrap.objects.get(id=12005)
+            queryset = IMDbScrapping.objects.get(id=12005)
             serialzier = ComplexImdbSerializers(instance=queryset)
+            logger.info('Success return data of particular ID')
             return Response(serialzier.data)
         except:
+            logger.error('Sorry, this ID is not present in thr database')
             return Response({'msg': "data not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
@@ -103,9 +112,13 @@ class DeleteObjects(APIView):
     # queryset = IMDbScrapping.objects.all()
     def delete(self, request):
         try:
-            IMDbScrap.objects.get(id=12005).delete()
+            IMDbScrapping.objects.get(id=20309).delete()
+            logger.info(
+                "Successfully the delete records of the given ID"
+            )
             return Response({'msg': "Done"}, status=status.HTTP_204_NO_CONTENT)
         except:
+            logger.error("Sorry, this ID is not available into the system")
             return Response({'msg': "data not found"}, status=status.HTTP_404_NOT_FOUND)
 
 class SelectObjects(APIView):
@@ -114,8 +127,9 @@ class SelectObjects(APIView):
     """
     serializer_class = ComplexImdbSerializers
     def get(self,request):
-        queryset = IMDbScrap.objects.select_related().all()
+        queryset = IMDbScrapping.objects.select_related().all()
         serializer = ComplexImdbSerializers(instance=queryset, many=True)
+        logger.info("Successfully run the select objects in the system ")
         return Response(serializer.data)
 
 class PrefetchObjects(APIView):
@@ -124,8 +138,9 @@ class PrefetchObjects(APIView):
     """
     serializer_class = ComplexImdbSerializers
     def get(self,request):
-        queryset = IMDbScrap.objects.prefetch_related().all()
+        queryset = IMDbScrapping.objects.prefetch_related().all()
         serializer = ComplexImdbSerializers(instance=queryset, many=True)
+        logger.info("Successfully run the prefetch objects in the system")
         return Response(serializer.data)
 
 class FieldCompareModels(APIView):
@@ -135,8 +150,9 @@ class FieldCompareModels(APIView):
     """
     serializer_class = ComplexImdbSerializers
     def get(self,request):
-        queryset = IMDbScrap.objects.filter(runtime__gte=F('rating'))
+        queryset = IMDbScrapping.objects.filter(runtime__gte=F('rating'))
         serializer = ComplexImdbSerializers(instance=queryset, many=True)
+        logger.info("Successfully the run the field compare models")
         return Response(serializer.data)
 
 class BulkUpdateView(APIView):
@@ -170,8 +186,11 @@ class BulkUpdateView(APIView):
             serializer = BulkUpdateSerializers(data=data, context=context, many=True)
             if serializer.is_valid():
                 serializer.save()
+                logger.info("Successfully bulk update into the system...")
                 return Response({'msg': "SuccessFully Update into the database"}, status=status.HTTP_201_CREATED)
+            logger.warning("some warning has been arise by serializers")
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        logger.error("Hey, some error has been arise into the system")
         return Response({'msg': 'No Data to process'}, status=status.HTTP_400_BAD_REQUEST)
 
 

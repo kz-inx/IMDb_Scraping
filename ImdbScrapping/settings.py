@@ -141,3 +141,52 @@ INTERNAL_IPS = [
     # ...
 ]
 
+# logging into the current project to check any breakup point arise.
+LOGGING = {
+    # Version of logging
+    'version': 1,
+    # disable logging
+    'disable_existing_loggers': False,
+    'loggers': {
+        'django': {
+            'handlers': ['file', 'file1', 'file2', 'file3', 'console'],
+            'level': 'INFO'
+        }
+    },
+    'handlers': {
+        'file': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': './logs/error.log',
+            'formatter': 'simpleRe',
+        },
+        'file1': {
+            'level': 'WARNING',
+            'class': 'logging.FileHandler',
+            'filename': './logs/warning.log',
+            'formatter': 'simpleRe',
+        },
+        'file2': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': './logs/info.log',
+            'formatter': 'simpleRe',
+        },
+        'file3': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': './logs/debug.log',
+            'formatter': 'simpleRe'
+        },
+        'console': {
+            'class': 'logging.StreamHandler',
+        }
+    },
+    'formatters': {
+        'simpleRe': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        }
+
+    }
+}

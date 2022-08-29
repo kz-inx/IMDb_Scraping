@@ -47,7 +47,6 @@ class ImdbSpiderSpider(scrapy.Spider):
                 item['link'] = movie_link
                 item['rating'] = movie_rating
                 item['description'] = movie_description
-                # item['amount'] = movie_get_amount
                 item['year'] = movie_release_year
                 item['runtime'] = movie_runtime
                 item['categories'] = movie_categories
